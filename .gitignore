@@ -80,3 +80,4 @@ docs/_build/
 ChangeLog
 .pre-commit-config-local.yaml
 odoo/
+.env
