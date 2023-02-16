@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="can_adm_phone_numbers" model="res.groups">
+            <field name="name">Phone manager</field>
+            <field name="comment">Permission to manage phones</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  db:
+    container_name: postgres-db
+    platform: linux/arm64/v8
+    image: postgres:9.5
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      #- PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      # Solo para desarrollo. Comentar en produccion
+      - '5432:5432'
+    expose:
+      # Solo para desarrollo. Comentar en produccion        
+      - '5432'
+    restart: always
+
+  web:
+    image: arm64v8/odoo:12.0
+    container_name: web
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    tty: true
+    environment:
+      - HOST=db
+      - USER=${POSTGRES_USER}
+      - PASSWORD=${POSTGRES_PASSWORD}
+    command: -- --dev=reload
+    # command: odoo scaffold /mnt/extra-addons/test_module
+    volumes:
+      # - ./entrypoint.sh:/entrypoint.sh   # if you want to install additional Python packages, uncomment this line!
+      - ./addons:/mnt/extra-addons
+      - ./etc/odoo.conf:/etc/odoo/odoo.conf
+      - ./odoo:/var/lib/odoo
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:4.6
+    container_name: pgadmin4
+    restart: always
+    environment:
+       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+       PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
+    ports:
+       - "8080:80"
+    links:
+       - "db:pgsql-server"
+       
+  nginx: 
+    image: nginx:latest
+    platform: linux/arm64/v8
+    container_name: nginx
+    depends_on:
+      - web    
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
