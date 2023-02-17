@@ -10,5 +10,6 @@
     'depends': ['base', 'contacts'],
     'data': [
         'views/views.xml',
+        'data/partner_cron.xml',
     ],
 }
